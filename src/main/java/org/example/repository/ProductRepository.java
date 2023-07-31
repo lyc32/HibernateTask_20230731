@@ -10,13 +10,10 @@ import java.util.List;
 
 public class ProductRepository
 {
+    private static Session session = null;
     public static void add(Product product)
     {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.addAnnotatedClass(Product.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session  = getSession();;
         session.beginTransaction();
         session.save(product);
         session.getTransaction().commit();
@@ -24,21 +21,13 @@ public class ProductRepository
 
     public static Product get(int id)
     {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.addAnnotatedClass(Product.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = getSession();;
         return session.get(Product.class, id);
     }
 
     public static List<Product> getAll()
     {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.addAnnotatedClass(Product.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session  = getSession();;
         Query query = session.createQuery("from Product");
         List<Product> productList = query.list();
         return productList;
@@ -46,11 +35,7 @@ public class ProductRepository
 
     public static void update(Product product)
     {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.addAnnotatedClass(Product.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session  = getSession();
         session.beginTransaction();
         session.update(product);
         session.getTransaction().commit();
@@ -58,14 +43,26 @@ public class ProductRepository
     }
     public static void delete(Product product)
     {
-        Configuration configuration = new Configuration();
-        configuration.configure("hibernate.cfg.xml");
-        configuration.addAnnotatedClass(Product.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        Session session = sessionFactory.openSession();
+        Session session = getSession();
         session.beginTransaction();
         session.delete(product);
         session.getTransaction().commit();
+    }
+
+    public static Session getSession()
+    {
+        if(session != null)
+        {
+            return session;
+        }
+        else
+        {
+            Configuration configuration = new Configuration();
+            configuration.configure("hibernate.cfg.xml");
+            configuration.addAnnotatedClass(Product.class);
+            SessionFactory sessionFactory = configuration.buildSessionFactory();
+            return sessionFactory.openSession();
+        }
     }
 
 }
